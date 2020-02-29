@@ -3,10 +3,10 @@ title: 'STAT 420: Homework 05'
 author: "Spring 2020, D. Unger"
 date: 'Due: Tuesday, March 3 by 11:30 PM CT'
 output:
-  pdf_document:
-    toc: yes
   html_document:
     theme: readable
+    toc: yes
+  pdf_document:
     toc: yes
 ---
 
@@ -73,6 +73,21 @@ Use an $F$-test to test the significance of the regression. Report the following
 - A conclusion in the context of the problem
 
 When reporting these, you should explicitly state them in your document, not assume that a reader will find and interpret them from a large block of `R` output.
+
+```{r}
+nutrition <- read.csv("nutrition.csv")
+
+fit <- lm(Calories ~ Carbs + Fat + Protein, data = nutrition)
+summary(fit)
+```
+
+- The null hypotheses is that all of the predictors are insignificant. The alternative hypothesis is that at least one of the predictors is significant. 
+- The value of the test statistic
+- The p-value of the test
+- A statistical decision at $\alpha = 0.01$
+- A conclusion in the context of the problem
+
+
 
 **(b)** Output only the estimated regression coefficients. Interpret all $\hat{\beta}_j$ coefficients in the context of the problem.
 
