@@ -1,6 +1,6 @@
 ---
 title: 'STAT 420: Homework 05'
-author: "Spring 2020, D. Unger"
+author: "Spring 2020, Yu Wu (yuw5)"
 date: 'Due: Tuesday, March 3 by 11:30 PM CT'
 output:
   html_document:
