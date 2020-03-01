@@ -10,23 +10,6 @@ output:
     toc: yes
 ---
 
-# Directions
-
-Students are encouraged to work together on homework. However, sharing, copying or providing any part of a homework solution or code is an infraction of the University's rules on Academic Integrity. Any violation will be punished as severely as possible.
-
-Final submissions must be uploaded to our Compass 2g site on the Homework page. No email, hardcopy, or late submissions will be accepted.
-
-- Your assignment must be submitted through the [submission link](https://compass2g.illinois.edu/webapps/assignment/uploadAssignment?content_id=_4279952_1&course_id=_49160_1&group_id=&mode=cpview) on **Compass 2g.** You are required to attach one `.zip` file, named `hw05_yourNetID.zip`, which contains:
-    - Your RMarkdown file which should be saved as `hw05_yourNetID.Rmd`. For example `hw05_rqzhu.Rmd`.
-    - The result of knitting your RMarkdown file as `hw05_yourNetID.html`. For example `hw05_rqzhu.html`.
-- Your resulting `.html` file will be considered a "report" which is the material that will determine the majority of your grade. Be sure to visibly include all `R` code and output that is relevant to answering the exercises. (You do not need to include irrelevant code you tried that resulted in error or did not answer the question correctly.)
-- You are granted an unlimited number of submissions, but only the last submission *before* the deadline will be viewed and graded.
-- If you use [this `.Rmd` file as a template](hw05.Rmd), be sure to remove the directions section. Consider removing `eval = FALSE` from any code chunks provided in the template, if you would like to run that code as part of your assignment.
-- Your `.Rmd` file should be written such that, if it is placed in a folder with any data your are asked to import, it will knit properly without modification.
-- Unless otherwise stated, you may use `R` for each of the exercises.
-- Be sure to read each exercise carefully!
-- Include your Name and NetID in the final document, not only in your filenames.
-
 # Assignment
 
 ## Exercise 1 (Using `lm`)
@@ -82,28 +65,92 @@ summary(fit)
 ```
 
 - The null hypotheses is that all of the predictors are insignificant. The alternative hypothesis is that at least one of the predictors is significant. 
-- The value of the test statistic
-- The p-value of the test
-- A statistical decision at $\alpha = 0.01$
-- A conclusion in the context of the problem
+- The value of the test statistic is 1.524e05.
+- The p-value of the test is 2.2e-16. 
+- A statistical decision at $\alpha = 0.01$ is reject the null hypothesis since the p-value is smaller than alpha.
+- A conclusion in the context of the problem is that the amount of calories of a food is related with at least one of the following predictors: Carbs, Fat and Protein.
 
 
 
 **(b)** Output only the estimated regression coefficients. Interpret all $\hat{\beta}_j$ coefficients in the context of the problem.
 
+```{r}
+summary(fit)$coef[,1]
+```
+
+$$
+Calories = 3.768 + 3.774*Carbs + 8.804*Fat + 3.967*Protein
+$$
+
+When there is no carbs, fat or protein, the amount of calories is 3.768; when carbs increases by one, the amount of calories increases by 3.774; when fat increases by one, the amount of calories increases by 8.804; when protein increases by one, the amount of calories increases by 3.967;
+
 **(c)** Use your model to predict the amount of `Calories` in a Big Mac. According to [McDonald's publicized nutrition facts](http://nutrition.mcdonalds.com/getnutrition/nutritionfacts.pdf), the Big Mac contains 47g of carbohydrates, 28g of fat, and 25g of protein.
+
+```{R}
+3.768 + 3.774*47 + 8.804*28 + 3.967*25
+```
+
+$$
+Calories_{BIG MAC}=3.768 + 3.774*47 + 8.804*28 + 3.967*25 = 526.833
+$$
+
+Big Mac has 526.833g calories.
 
 **(d)** Calculate the standard deviation, $s_y$, for the observed values in the Calories variable. Report the value of $s_e$ from your multiple regression model. Interpret both estimates in the context of this problem.
 
+```{r}
+s_y <- sd(nutrition$Calories)
+s_e <- summary(fit)$sigma
+
+s_y
+s_e
+```
+
+The standard deviation tells us how much the calories spread out within the dataset. The standard error tells us how much our residuals or the fitted values spread out within the fitted model. 
+
 **(e)** Report the value of $R^2$ for the model. Interpret its meaning in the context of the problem.
+
+```{r}
+summary(fit)$r.squared
+```
+
+The $R^2$ of the model is 0.989. It means 98.9% of the data is explained by the fitted model. 
 
 **(f)** Calculate a 90% confidence interval for $\beta_2$. Give an interpretation of the interval in the context of the problem.
 
+```{r}
+confint(fit, level = 0.90)[3,]
+```
+
+We are 90% confident that the value of $\beta_2$ is between 8.779 and 8.829. 
+
 **(g)** Calculate a 95% confidence interval for $\beta_0$. Give an interpretation of the interval in the context of the problem.
 
+```{r}
+confint(fit, level = 0.95)[1,]
+```
+
+We are 95% confident that the value of $\beta_0$ is between 2.803 and 4.733. 
+
+
 **(h)** Use a 99% confidence interval to estimate the mean Calorie content of a small order of McDonald's french fries that has 30g of carbohydrates, 11g of fat, and 2g of protein. Interpret the interval in context.
- 
+
+```{r} 
+x <- data.frame(Carbs = 30, Fat = 11, Protein = 2)
+predict(fit, newdata = x, interval = 'confidence', level = 0.99)
+```
+
+We are 99% sure that the amount of calories of french fries with the given data is between 220.892g and 222.620g.
+
 **(i)** Use a 90% prediction interval to predict the Calorie content of new healthy menu item that has 11g of carbohydrates, 1.5g of fat, and 1g of protein. Interpret the interval in context.
+
+```{r} 
+x <- data.frame(Carbs = 11, Fat = 1.5, Protein = 1)
+predict(fit, newdata = x, interval = 'confidence', level = 0.90)
+```
+
+We are 90% sure that the amount of calories of french fries with the given data is between 61.77276g and 63.12954g.
+
 
 ## Exercise 2 (More `lm`)
 
@@ -117,6 +164,18 @@ For this exercise we will again use the nutrition data.
 - A statistical decision at $\alpha = 0.01$
 - A conclusion in the context of the problem
 
+```{r}
+fit <- lm(Calories ~ Carbs + Sodium + Fat + Protein, data = nutrition)
+summary(fit)
+```
+
+- The null hypotheses is all of the predictors are
+- The value of the test statistic
+- The p-value of the test
+- A statistical decision at $\alpha = 0.01$
+- A conclusion in the context of the problem
+
+
 **(b)** For each of the predictors in part **(a)**, perform a $t$-test for the significance of its regression coefficient. Report the following for each:
  
 - The null and alternative hypotheses
@@ -124,7 +183,44 @@ For this exercise we will again use the nutrition data.
 - The p-value of the test
 - A statistical decision at $\alpha = 0.01$
 
-**(c)** Based on your results in part **(b)**, do you still prefer the model in part **(a)**, or is there instead a model with three predictors that you prefer? Briefly explain.
+```{r}
+summary(fit)$coef
+```
+
+Carbs:   
+
+- $H_0: \beta_{Carbs}=0$ VS $H_a: \beta_{Carbs} \neq0$
+- $t=388.717271$
+- $p-value = 0$
+- A statistical decision at $\alpha = 0.01$ is reject the null.
+
+Sodium:   
+
+- $H_0: \beta_{Sodium}=0$ VS $H_a: \beta_{Sodium} \neq0$
+- $t=1.362579$
+- $p-value = 1.730749e-01$
+- A statistical decision at $\alpha = 0.01$ is fail to reject the null.
+
+Fat:   
+
+- $H_0: \beta_{Fat}=0$ VS $H_a: \beta_{Fat} \neq0$
+- $t=575.261702$
+- $p-value = 0$
+- A statistical decision at $\alpha = 0.01$ is reject the null.
+
+Protein:   
+
+- $H_0: \beta_{Protein}=0$ VS $H_a: \beta_{Protein} \neq0$
+- $t=150.533385$
+- $p-value = 0$
+- A statistical decision at $\alpha = 0.01$ is reject the null.
+
+
+
+**(c)** Based on your results in part **(b)**, do you still prefer the model in part
+**(a)**, or is there instead a model with three predictors that you prefer? Briefly explain.
+
+No, because the Sodium predictor is insignificant, and we can drop it from the model. The reduced model would be the one in part 1(a).
 
 ## Exercise 3 (Comparing Models)
 
@@ -152,6 +248,19 @@ Use an $F$-test to test the significance of the regression. Report the following
  
 When reporting these, you should explicitly state them in your document, not assume that a reader will find and interpret them from a large block of `R` output.
 
+```{r}
+goalies_cleaned <- read.csv("goalies_cleaned.csv")
+
+fit <- lm(W ~ ., data = goalies_cleaned)
+summary(fit)
+```
+
+- $H_0: \beta_1=\beta_2=\beta_3=\beta_4=\beta_5=\beta_6=\beta_7=\beta_8 =0$ VS $H_a: \beta_1=\beta_2=\beta_3=\beta_4=\beta_5=\beta_6=\beta_7=\beta_8 \neq0$
+- $F=3938$
+- $p-value = 2.2e-16$
+- A statistical decision at $\alpha = 0.10$ is reject the null.
+- Based on the F-Test, we can conclude that the number of wins is related with at least one of those predictors. 
+
 **(b)** Calculate the RMSE of this full model. Report the residual standard error of this full model. What is the relationship of these two values?
 
 Recall, we have defined RMSE as,
@@ -160,13 +269,42 @@ Recall, we have defined RMSE as,
 RMSE = \sqrt{\frac{1}{n} \sum_{i = 1}^{n}(y_i - \hat{y}_i)^2}.
 \]
 
+```{r}
+rmse <- sqrt(mean(resid(fit)^2))
+rmse
+
+summary(fit)$sigma
+```
+
+The two values are both estimators of standard deviation of errors. 
+
 **(c)** Fit a model with Wins as the response and with Goals Against, Goals Against Average, Saves, and Save Percentage as the predictors. Calculate the RMSE of this model.
+
+```{r}
+fit2 <- lm(W ~ GA + GAA + SV + SV_PCT, data = goalies_cleaned)
+summary(fit2)
+
+rmse2 <- sqrt(mean(resid(fit2)^2))
+rmse2
+```
 
 **(d)** Fit a model with Wins as the response and with Goals Against Average and Save Percentage as the predictors. Calculate the RMSE of this model.
 
+```{r}
+fit3 <- lm(W ~ GAA +SV_PCT, data = goalies_cleaned)
+summary(fit3)
+
+rmse3 <- sqrt(mean(resid(fit3)^2))
+rmse3
+```
+
 **(e)** Based on the previous three models, which model is most helpful for predicting wins? Briefly explain.
 
+The full model is most helpful amoung all the others, because it has the lowest RMSE. 
+
+
 **(f)** Conduct an ANOVA $F$-test comparing the models in parts **(c)** and **(d)**. Report the following:
+
  
 - The null and alternative hypotheses
 - The value of the test statistic
@@ -176,17 +314,70 @@ RMSE = \sqrt{\frac{1}{n} \sum_{i = 1}^{n}(y_i - \hat{y}_i)^2}.
  
 When reporting these, you should explicitly state them in your document, not assume that a reader will find and interpret them from a large block of `R` output.
 
+ 
+```{r}
+anova(fit3, fit2)
+```
+
+- $H_0: \beta_{GA}=\beta_{SV}=0$ VS $H_a: \beta_{GA}=\beta_{SV} \neq0$
+- $F=3599.8 $
+- $p-value = 2.2e-16$
+- A statistical decision at $\alpha = 0.10$ is reject the null.
+- Based on the F-Test, we can conclude that the model that contains GA and SV is better.
+
+
 ## Exercise 4 (Regression without `lm`)
 
 For this exercise use the `prostate` dataset from the `faraway` package. Use `?prosate` to learn about the dataset. The goal of this exercise is to fit a model with `lpsa` as the response and the remaining variables as predictors.
 
 **(a)** Obtain the estimated regression coefficients **without** the use of `lm()` or any other built-in functions for regression. That is, you should use only matrix operations. Store the results in a vector `beta_hat_no_lm`. To ensure this is a vector, you may need to use `as.vector()`. Return this vector as well as the results of `sum(beta_hat_no_lm)`.
 
+```{r}
+library("faraway")
+data("prostate")
+
+n = nrow(prostate)
+x = as.matrix(cbind(rep(1, n), prostate[,1-ncol(prostate)-1]))
+y = prostate$lpsa
+beta_hat_no_lm = as.vector(solve(t(x) %*% x) %*% t(x) %*% y)
+beta_hat_no_lm
+sum(beta_hat_no_lm)
+```
+
 **(b)** Obtain the estimated regression coefficients **with** the use of `lm()`. Store the results in a vector `beta_hat_lm`. To ensure this is a vector, you may need to use `as.vector()`. Return this vector as well as the results of `sum(beta_hat_lm)`.
+
+```{r}
+fit <- lm(lpsa ~ ., data = prostate)
+beta_hat_lm <- as.vector(summary(fit)$coef[, 1])
+beta_hat_lm
+sum(beta_hat_lm)
+```
 
 **(c)** Use the `all.equal()` function to verify that the results are the same. You may need to remove the names of one of the vectors. The `as.vector()` function will do this as a side effect, or you can directly use `unname()`.
 
+```{r}
+all.equal(beta_hat_lm, beta_hat_no_lm)
+```
+
 **(d)** Calculate $s_e$ without the use of `lm()`. That is, continue with your results from **(a)** and perform additional matrix operations to obtain the result. Output this result. Also, verify that this result is the same as the result obtained from `lm()`.
+
+```{r}
+p <- length(coef(fit))
+y_hat <- x %*% solve(t(x) %*% x) %*% t(x) %*% y
+e <- y - y_hat
+s_e <- sqrt(t(e) %*% e / (n - p))
+
+s_e
+all.equal(summary(fit)$sigma,as.vector(s_e))
+```
 
 **(e)** Calculate $R^2$ without the use of `lm()`. That is, continue with your results from **(a)** and **(d)** and perform additional operations to obtain the result. Output this result. Also, verify that this result is the same as the result obtained from `lm()`.
 
+```{r}
+SST <- sum((y - mean(y)) ^ 2)
+SSF <- sum((y_hat - mean(y)) ^ 2)
+R2 <- SSF / SST
+
+R2
+all.equal(R2,summary(fit)$r.squared)
+```
